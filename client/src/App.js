@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Route } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import SavedList from "./Movies/SavedList";
 import MovieList from "./Movies/MovieList";
 import Movie from "./Movies/Movie";
+import UpdateForm from "./Movies/forms/UpdateForm";
 
 const App = () => {
   const [savedList, setSavedList] = useState([]);
@@ -14,13 +15,20 @@ const App = () => {
   return (
     <>
       <SavedList list={savedList} />
-      <Route exact path="/" component={MovieList} />
+      <Switch></Switch>
+      <Route
+        path="/movies/update/:id?"
+        render={props => {
+          return <UpdateForm {...props} />;
+        }}
+      />
       <Route
         path="/movies/:id"
         render={props => {
           return <Movie {...props} addToSavedList={addToSavedList} />;
         }}
       />
+      <Route exact path="/" component={MovieList} />
     </>
   );
 };
