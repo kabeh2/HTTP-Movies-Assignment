@@ -1,5 +1,6 @@
 import React from "react";
-import { Formik, Form, FieldArray } from "formik";
+import { Formik, Form } from "formik";
+import axios from "axios";
 import * as Yup from "yup";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -7,12 +8,8 @@ import Card from "@material-ui/core/Card";
 import Typography from "@material-ui/core/Typography";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
-import Fab from "@material-ui/core/Fab";
-import AddIcon from "@material-ui/icons/Add";
-import IconButton from "@material-ui/core/IconButton";
-import DeleteIcon from "@material-ui/icons/Delete";
-import InputAdornment from "@material-ui/core/InputAdornment";
 import TextInput from "./TextInput";
+import MyFieldArray from "./MyFieldArray";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -38,8 +35,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const UpdateForm = () => {
+const UpdateForm = ({ location, history }) => {
   const classes = useStyles();
+
+  console.log("PROPS", history, location);
 
   return (
     <div className={classes.root}>
@@ -60,11 +59,13 @@ const UpdateForm = () => {
             <Grid item container>
               <Formik
                 initialValues={{
-                  id: Date.now(),
-                  title: "",
-                  director: "",
-                  metascore: "",
-                  stars: []
+                  id: location.state ? location.state.movie.id : Date.now(),
+                  title: location.state ? location.state.movie.title : "",
+                  director: location.state ? location.state.movie.director : "",
+                  metascore: location.state
+                    ? location.state.movie.metascore
+                    : "",
+                  stars: location.state ? [...location.state.movie.stars] : []
                 }}
                 validationSchema={Yup.object({
                   title: Yup.string()
@@ -82,14 +83,35 @@ const UpdateForm = () => {
                       .required("At least one star name is Required.")
                   )
                 })}
-                onSubmit={(values, { setSubmitting }) => {
-                  setTimeout(() => {
-                    alert(JSON.stringify(values, null, 2));
+                onSubmit={async (
+                  values,
+                  { setSubmitting, setErrors, setStatus, resetForm }
+                ) => {
+                  try {
+                    location.state
+                      ? await axios.put(
+                          `http://localhost:5000/api/movies/${location.state.movie.id}`,
+                          values
+                        )
+                      : await axios.post(
+                          `http://localhost:5000/api/movies/`,
+                          values
+                        );
+                    resetForm({});
+                    setStatus({ success: true });
+                    history.replace(
+                      location.state
+                        ? `/movies/${location.state.movie.id}`
+                        : "/"
+                    );
+                  } catch (error) {
+                    setStatus({ success: false });
                     setSubmitting(false);
-                  }, 400);
+                    setErrors({ submit: error.message });
+                  }
                 }}
               >
-                {({ values, error }) => (
+                {({ values }) => (
                   <Form>
                     <TextInput
                       label="Movie Title"
@@ -109,69 +131,7 @@ const UpdateForm = () => {
                       type="text"
                       placeholder="Metascore..."
                     />
-                    <FieldArray
-                      name="stars"
-                      render={arrayHelpers => (
-                        <div>
-                          {values.stars && values.stars.length > 0 ? (
-                            values.stars.map((star, index) => (
-                              <div key={index}>
-                                <TextInput
-                                  name={`stars.${index}`}
-                                  label="Add Actor"
-                                  InputProps={{
-                                    endAdornment: (
-                                      <InputAdornment position="end">
-                                        <IconButton
-                                          size="small"
-                                          color="secondary"
-                                          aria-label="delete"
-                                          onClick={() =>
-                                            arrayHelpers.remove(index)
-                                          } // remove a friend from the list
-                                        >
-                                          <DeleteIcon />
-                                        </IconButton>
-                                      </InputAdornment>
-                                    )
-                                  }}
-                                />
-                              </div>
-                            ))
-                          ) : (
-                            <TextInput
-                              name={`stars.0`}
-                              label="Add Actor"
-                              InputProps={{
-                                endAdornment: (
-                                  <InputAdornment position="end">
-                                    <IconButton
-                                      size="small"
-                                      color="secondary"
-                                      aria-label="delete"
-                                      onClick={() => arrayHelpers.remove(0)} // remove a friend from the list
-                                    >
-                                      <DeleteIcon />
-                                    </IconButton>
-                                  </InputAdornment>
-                                )
-                              }}
-                            />
-                          )}
-
-                          <Fab
-                            size="small"
-                            aria-label="Add Actor"
-                            variant="extended"
-                            color="secondary"
-                            onClick={() => arrayHelpers.push("")}
-                          >
-                            <AddIcon />
-                            Add an Actor
-                          </Fab>
-                        </div>
-                      )}
-                    />
+                    <MyFieldArray name="stars" values={values} />
 
                     <Grid
                       item

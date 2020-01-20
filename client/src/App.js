@@ -15,20 +15,27 @@ const App = () => {
   return (
     <>
       <SavedList list={savedList} />
-      <Switch></Switch>
-      <Route
-        path="/movies/update/:id?"
-        render={props => {
-          return <UpdateForm {...props} />;
-        }}
-      />
-      <Route
-        path="/movies/:id"
-        render={props => {
-          return <Movie {...props} addToSavedList={addToSavedList} />;
-        }}
-      />
-      <Route exact path="/" component={MovieList} />
+      <Switch>
+        <Route
+          path="/update-movie/:id?"
+          render={props => {
+            return <UpdateForm {...props} />;
+          }}
+        />
+        <Route
+          path="/add-movie/"
+          render={props => {
+            return <UpdateForm {...props} />;
+          }}
+        />
+        <Route
+          path="/movies/:id"
+          render={props => {
+            return <Movie {...props} addToSavedList={addToSavedList} />;
+          }}
+        />
+        <Route exact path="/" component={MovieList} />
+      </Switch>
     </>
   );
 };

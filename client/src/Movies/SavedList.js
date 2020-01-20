@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { NavLink, Link } from "react-router-dom";
+import { Button } from "@material-ui/core";
 export default class SavedList extends Component {
   render() {
     return (
@@ -16,9 +17,18 @@ export default class SavedList extends Component {
             </NavLink>
           );
         })}
-        <div className="home-button">
-          <Link to="/">Home</Link>
-        </div>
+
+        <Link to="/add-movie">
+          <Button variant="contained" color="secondary">
+            Add Movie
+          </Button>
+        </Link>
+
+        <Link to="/">
+          <Button variant="contained" color="primary">
+            Home
+          </Button>
+        </Link>
       </div>
     );
   }
