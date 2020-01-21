@@ -52,8 +52,8 @@ const UpdateForm = ({ location, history }) => {
         <Card className={classes.card}>
           <CardContent className={classes.card}>
             <Grid item>
-              <Typography variant="h3" gutterBottom>
-                Update!
+              <Typography variant="h4" gutterBottom>
+                {location.state ? "Update Movie" : "Add Movie"}
               </Typography>
             </Grid>
             <Grid item container>
@@ -69,17 +69,17 @@ const UpdateForm = ({ location, history }) => {
                 }}
                 validationSchema={Yup.object({
                   title: Yup.string()
-                    .max(15, "Must be 15 characters or less")
+                    .max(30, "Must be 30 characters or less")
                     .required("Required"),
                   director: Yup.string()
-                    .max(20, "Must be 20 characters or less")
+                    .max(30, "Must be 30 characters or less")
                     .required("Required"),
                   metascore: Yup.number()
                     .min(0, "Muse be a number higher than 0")
                     .required("Required"),
                   stars: Yup.array().of(
                     Yup.string()
-                      .max(15, "Must be 15 characters or less")
+                      .max(30, "Must be 30 characters or less")
                       .required("At least one star name is Required.")
                   )
                 })}
@@ -140,7 +140,10 @@ const UpdateForm = ({ location, history }) => {
                       className={classes.footerMargin}
                     >
                       <Grid item>
-                        <Button variant="contained" type="submit">
+                        <Button
+                          variant="contained"
+                          onClick={() => history.goBack()}
+                        >
                           Cancel
                         </Button>
                       </Grid>
@@ -150,7 +153,7 @@ const UpdateForm = ({ location, history }) => {
                           color="secondary"
                           type="submit"
                         >
-                          Submit
+                          {location.state ? "Update" : "Submit"}
                         </Button>
                       </Grid>
                     </Grid>
