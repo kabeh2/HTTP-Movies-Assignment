@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, Redirect } from "react-router-dom";
 import SavedList from "./Movies/SavedList";
 import MovieList from "./Movies/MovieList";
 import Movie from "./Movies/Movie";
@@ -34,7 +34,8 @@ const App = () => {
             return <Movie {...props} addToSavedList={addToSavedList} />;
           }}
         />
-        <Route exact path="/" component={MovieList} />
+        <Route path="/" component={MovieList} />
+        <Redirect to="/" />
       </Switch>
     </>
   );
