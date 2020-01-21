@@ -1,8 +1,12 @@
 import React from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import MovieCard from "./MovieCard";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import Container from "@material-ui/core/Container";
+import Grid from "@material-ui/core/Grid";
 import { Button } from "@material-ui/core";
+import MovieCard from "./MovieCard";
+import Box from "@material-ui/core/Box";
 
 export default class Movie extends React.Component {
   constructor(props) {
@@ -15,7 +19,6 @@ export default class Movie extends React.Component {
   componentDidMount() {
     this.fetchMovie(this.props.match.params.id);
     console.log("MATCH", this.props);
-    // console.log("STATE", this.state);
   }
 
   componentWillReceiveProps(newProps) {
@@ -36,22 +39,13 @@ export default class Movie extends React.Component {
   };
 
   deleteMovie = id => {
-    // Remove from state
-    // 1. Save copy
-    const movieCopy = [...this.props.location.state.movies];
-
-    // 2. Isolate
-    const movieNew = [...this.props.location.state.movies].filter(
-      movie => movie.id !== id
-    );
-
-    console.log("MOVIENEW", movieNew);
-
-    // this.props.location.state.deleteMovie(movieNew);
-    // 3. Update State
-
-    // Remove from server
-    // axios.delete(`http://localhost:5000/api/movies/${id}`);
+    try {
+      axios.delete(`http://localhost:5000/api/movies/${id}`);
+      window.location = "/";
+      // this.props.history.replace("/");
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   saveMovie = () => {
@@ -66,29 +60,49 @@ export default class Movie extends React.Component {
 
     return (
       <div className="save-wrapper">
-        <MovieCard movie={this.state.movie} />
-        <div className="save-button" onClick={this.saveMovie}>
-          Save
-        </div>
-        <Link
-          to={{
-            pathname: `/update-movie/${this.props.match.params.id}`,
-            state: {
-              movie: this.state.movie
-            }
-          }}
-        >
-          <Button variant="contained" color="primary">
-            Update
-          </Button>
-        </Link>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => this.deleteMovie(this.state.movie.id)}
-        >
-          Delete
-        </Button>
+        <CssBaseline />
+        <Container maxWidth="sm">
+          <MovieCard movie={this.state.movie} />
+
+          <Grid item container spacing={1}>
+            <div style={{ width: "100%" }}>
+              <Box display="flex" justifyContent="space-between">
+                <Grid item>
+                  <Button
+                    variant="outlined"
+                    onClick={this.saveMovie}
+                    color="primary"
+                  >
+                    Save
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Link
+                    to={{
+                      pathname: `/update-movie/${this.props.match.params.id}`,
+                      state: {
+                        movie: this.state.movie
+                      }
+                    }}
+                  >
+                    <Button variant="contained" color="primary">
+                      Update
+                    </Button>
+                  </Link>
+                </Grid>
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => this.deleteMovie(this.state.movie.id)}
+                  >
+                    Delete
+                  </Button>
+                </Grid>
+              </Box>
+            </div>
+          </Grid>
+        </Container>
       </div>
     );
   }
